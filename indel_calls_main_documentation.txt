@@ -1,0 +1,63 @@
+#===============================================================================
+#
+#         FILE: /Users/Alec/Documents/Bioinformatics/MDV_Project/snp_phylo/indel_calls_main_documentation.txt
+#
+#        USAGE: Script can be run line by line. Brittle script.
+#
+#  DESCRIPTION:  This script serves as a step by step documentation script for indel calling on MDV strains with VARSCAN
+# REQUIREMENTS:  ---
+#        NOTES:  ---
+#       AUTHOR:  Alec Steep, steepale@msu.edu
+#  AFFILIATION:  Michigan State University (MSU), East Lansing, MI, United States
+#				         USDA ARS Avian Disease and Oncology Lab (ADOL), East Lansing, MI, United States
+#				         Technical University of Munich (TUM), Weihenstephan, Germany
+#      VERSION:  1.0
+#      CREATED:  2019.05.10
+#     REVISION:  
+#===============================================================================
+
+# Prep file for INDEL calling
+# On MSU HPCC (Raw read directory)
+# /mnt/research/ADOL/Cheng-Lab-Data/projects/20131022_abp_mdvVv+SixVirusWholeGenomeSequencing
+# On MSU HPCC (Project Directory)
+cd /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/snp_phylo
+# On MacBook
+#  cd /Users/Alec/Documents/Bioinformatics/MDV_Project/snp_phylo/
+
+# Load modules
+module load GNU/4.4.5
+module load SAMTools/0.1.18
+module load VarScan/2.3.6
+
+# Call indels for each sample
+for sample in "686_wt_TAAGGCGA-TAGATCGC_L001_R" 'AC722_3_GCTACGCT-GTAAGGAG_L001_R' 'AC730_S6_3A_CGAGGCTG-ACTGCATA_L001_R' 'AC738_B1_AAGAGGCA-AAGGAGTA_L001_R' 'AC739_CON1_GTAGAGGA-CTAAGCCT_L001_R'
+do
+echo ${sample}
+# Prep file for INDEL calling
+#echo "Prepping file for Indel calling..."
+#samtools mpileup \
+#--no-BAQ \
+#--fasta-ref /mnt/research/ADOL/Cheng-Lab-Data/projects/20160714_abp_ConradDeop/chicken_gene_expression/GallidHerpesvirus2_md5_hq149525.fa \
+#/mnt/research/ADOL/Cheng-Lab-Data/projects/20141009_abp_mdvAmplicons/${sample}_aln_sorted.bam \
+#> /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/snp_phylo/data/${sample}_aln_sorted_mpileup.txt
+#echo "Done"
+# Call Indels with VarScan
+echo "Calling Indels with VarScan2"
+java -jar $EBROOTVARSCAN/VarScan.v2.4.1.jar pileup2indel \
+/mnt/research/ADOL/Cheng-Lab-Data/projects/20131022_abp_mdvVv+SixVirusWholeGenomeSequencing/${sample}_vir_tophat_out/accepted_hits_sorted_mpileup.txt \
+--min-coverage 8 \
+--min-reads2 3 \
+--min-avg-qual 15 \
+--min-var-freq 0.1 \
+--min-freq-for-hom 0.75 \
+--p-value 0.01 \
+> /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/snp_phylo/data/${sample}_aln_sorted_mpileup_varscan_indel.txt 
+echo "Done"
+done
+
+
+
+
+
+
+

@@ -1,0 +1,233 @@
+---
+title: "Represent MDV Indels in Table"
+author: "Alec Steep"
+date: "May 10, 2019"
+output: html_document
+---
+
+We called Indels from different strains of Marek's Disease Virus with VarScan2. This script organizes those calls, annotates which genes they occurred in, and present them in a table for publication.
+
+## Resources, Dependencies, and Environment
+
+Set options and working directory:
+```{r setup, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Set the working directory
+wd = '/Users/Alec/Documents/Bioinformatics/MDV_Project/snp_phylo'
+knitr::opts_knit$set(root.dir = wd)
+# Comprable to:
+# setwd(wd)
+```
+
+In case you need to install dependencies:
+```{r, Install}
+#BiocManager::install("EDASeq")
+```
+
+Load dependencies:
+```{r Dependencies, warning=FALSE, message=FALSE}
+library(purrr)
+pacs...man <- c("dplyr","tibble","stringr", "data.table","GenomicRanges","GenomicFeatures",
+                "Biostrings","BSgenome","AnnotationHub","BSgenome.Ggallus.UCSC.galGal5",
+                "org.Gg.eg.db","stringdist",'tidyr','BSgenome.Hsapiens.UCSC.hg19','cluster',
+                'biomaRt','ggplot2','GenomicRanges')
+purrr::walk(pacs...man, .f = function(X) {
+        do.call("library", list(X)) 
+})
+```
+
+#### Functions
+
+Make the 'not in' operator:
+
+```{r, not function}
+'%!in%' <- function(x,y) {
+        !('%in%'(x,y))
+}
+```
+
+## Load Indels and Annotate
+
+#### Create a BSgenome object
+
+```{r, BSgenome}
+mdv_fa <- './data/Md5B40BAC.fasta'
+mdv_seq = readDNAStringSet(mdv_fa)[[1]]
+mdv_string <- readDNAStringSet(mdv_fa)
+```
+
+#### Load indel calls from each sample into a dataframe
+
+```{r, Load Samples}
+samples = c('686_wt_TAAGGCGA-TAGATCGC_L001_R','AC722_3_GCTACGCT-GTAAGGAG_L001_R','AC730_S6_3A_CGAGGCTG-ACTGCATA_L001_R','AC738_B1_AAGAGGCA-AAGGAGTA_L001_R','AC739_CON1_GTAGAGGA-CTAAGCCT_L001_R')
+indel_df <- data.frame()
+for (sample in samples) {
+        # Load in the indels for each virus
+        infile = paste0('./data/',sample,'_aln_sorted_mpileup_varscan_indel.txt')
+        i_df <- read.table(infile, header = TRUE, sep = '\t')
+        head(i_df)
+        i_df$Sample <- sample
+        indel_df <- rbind(indel_df, i_df)
+}
+head(indel_df)
+```
+
+#### Annotate indels in GRanges
+
+```{r, GRanges}
+indel_gr <- makeGRangesFromDataFrame(indel_df,
+                                     keep.extra.columns = TRUE,
+                                     ignore.strand=TRUE,
+                                     seqnames.field='Chrom',
+                                     start.field = 'Position',
+                                     end.field = 'Position',
+                                     starts.in.df.are.0based=FALSE)
+```
+
+#### Load the gene annotation
+
+```{r, Annotation}
+infile = "./data/GallidHerpesvirus2_md5_hq149525_annotation.txt"
+ann_df <- read.table(infile, header = TRUE, sep = '\t', comment = '#')
+ann_df <- ann_df %>% dplyr::select('START','STOP','STRAND','GENE')
+ann_df$CHROM <- "gi|306447494|gb|HQ149525.1|"
+head(ann_df)
+```
+
+#### Annotate the annotation in the Granges objects
+```{r, Annotation_v2}
+ann_gr <- makeGRangesFromDataFrame(ann_df,
+                                   keep.extra.columns = TRUE,
+                                   ignore.strand=FALSE,
+                                   seqnames.field='CHROM',
+                                   start.field = 'START',
+                                   end.field = 'STOP',
+                                   starts.in.df.are.0based=FALSE,
+                                   strand.field = 'STRAND')
+```
+
+
+#### Find the overlaps between indels and gene anootation
+```{r, Overlaps}
+olaps <- findOverlaps(ann_gr, indel_gr)
+f1 <- factor(subjectHits(olaps),
+             levels=seq_len(subjectLength(olaps)))
+genes <- splitAsList(mcols(ann_gr)[['GENE']][queryHits(olaps)], f1)
+```
+
+#### Data munging 
+```{r, Mung}
+# Annotate the variants
+elementMetadata(indel_gr)[[ 'GENE' ]] <- genes
+# Add the column to metadata
+mcols(indel_gr)$GENE <- as.character(mcols(indel_gr)$GENE)
+
+# Convert the GRanges object into a dataframe
+var_df <- as.data.frame(indel_gr)
+head(var_df)
+
+# Adjust sample names 
+x <- str_split(var_df$Sample,'-')
+# Grab first element of nested list
+x <- sapply(x, `[[`, 1)
+var_df$Sample <- substr(x,1,nchar(x)-9)
+
+# Compress columns
+indel_df <- var_df
+indel_df <- unite(indel_df, 
+      col = "Reads1:Reads2:VarFreq:Strands1:Strands2:Qual1:Qual2,Pvalue", 
+      c("Reads1","Reads2","VarFreq","Strands1","Strands2","Qual1","Qual2","Pvalue"), 
+      sep =":", 
+      remove = TRUE)
+indel_df <- unite(indel_df, 
+                  col = "MapQual1:MapQual2:Reads1Plus:Reads1Minus:Reads2Plus:Reads2Minus:VarAllele", 
+                  c("MapQual1","MapQual2","Reads1Plus","Reads1Minus","Reads2Plus","Reads2Minus","VarAllele"), 
+                  sep =":", 
+                  remove = TRUE)
+
+# Adjust the GENE column
+indel_df <- indel_df %>% mutate(Gene = ifelse(!is.na(GENE), GENE, '.'))
+indel_df <- indel_df %>% dplyr::select('seqnames','start','Ref','Cons',
+                          "Reads1:Reads2:VarFreq:Strands1:Strands2:Qual1:Qual2,Pvalue",
+                          "MapQual1:MapQual2:Reads1Plus:Reads1Minus:Reads2Plus:Reads2Minus:VarAllele",
+                          "Sample","Gene")
+names(indel_df) <- c('chr','pos','ref','alt',
+                     "reads1:reads2:varfreq:strands1:strands2:qual1:qual2,pvalue",
+                     "mapqual1:mapqual2:reads1plus:reads1minus:reads2plus:reads2minus:varallele",
+                     "sample","gene")
+indel_df <- indel_df %>% dplyr::select('chr','pos','ref','alt',"sample","gene",
+                                               "reads1:reads2:varfreq:strands1:strands2:qual1:qual2,pvalue",
+                                               "mapqual1:mapqual2:reads1plus:reads1minus:reads2plus:reads2minus:varallele")
+
+# Sort the column by position
+indel_df <- indel_df %>% arrange(pos) 
+
+# Replace sample names
+indel_df$sample <- str_replace(indel_df$sample, 'AC722_3','AC722')
+indel_df$sample <- str_replace(indel_df$sample, 'AC730_S6_3A','AC730')
+indel_df$sample <- str_replace(indel_df$sample, 'AC738_B1','AC738')
+indel_df$sample <- str_replace(indel_df$sample, 'AC739_CON1','AC739')
+indel_df$sample <- str_replace(indel_df$sample, '686_wt','686')
+
+# Adjust the indel ref and alt fields
+head(indel_df)
+# Adjust alt names
+x <- str_split(indel_df$alt,'/')
+# Grab first element of nested list
+indel_df$alt <- sapply(x, `[[`, 2)
+
+# Select the final columns before adjustment for convenience with printing
+indel_df <- indel_df %>% dplyr::select('chr','pos','ref','alt',"sample","gene")
+
+# Adjust the ref and alt fields to be characters
+indel_df$ref <- as.character(indel_df$ref)
+indel_df$alt <- as.character(indel_df$alt)
+
+# Adjust the ref field
+indel_df <- indel_df %>% 
+        mutate(ref = case_when(grepl('-', alt) ~ paste0(ref,str_remove(alt,'-')),
+                               grepl('+',alt) ~ as.character(ref)))
+# Adjust the alt field
+indel_df <- indel_df %>% mutate(alt = case_when(grepl('-', alt) ~ paste0(substr(ref,1,1)),
+                                         grepl('+', alt) ~ paste0(ref,str_remove(alt,'\\+'))))
+
+head(indel_df)
+```
+
+Create a final table for publication
+```{r, Pub Table}
+
+# Annotate each sample for mutation, transform data
+# Group the samples by all but samples column, cat the samples column
+indel_df <- indel_df %>%
+        group_by(chr,pos,ref, alt, gene) %>%
+        summarize(sample = toString(sample))
+
+# Add additional columns to generate table grouped by variants across sample cohort
+indel_df <- indel_df %>% mutate(wt_686 = ifelse(grepl('686',sample), 1,0))
+indel_df <- indel_df %>% mutate(AC722 = ifelse(grepl('AC722',sample), 1,0))
+indel_df <- indel_df %>% mutate(AC730 = ifelse(grepl('AC730',sample), 1,0))
+indel_df <- indel_df %>% mutate(AC738 = ifelse(grepl('AC738',sample), 1,0))
+indel_df <- indel_df %>% mutate(AC739 = ifelse(grepl('AC739',sample), 1,0))
+
+# Remove the sample column
+indel_df <- indel_df %>% dplyr::select(-sample)
+head(indel_df)
+```
+
+#### Save the dataframe to file
+```{r, Save Table}
+write.table(indel_df, file = './data/mdv_indels_genes.txt', sep ='\t',
+            quote = FALSE, row.names = FALSE)
+```
+
+#### Session Info
+```{r, session}
+sessionInfo()
+```
+
+
+
+
+
+

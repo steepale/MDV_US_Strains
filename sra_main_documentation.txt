@@ -1,0 +1,343 @@
+#===============================================================================
+#
+#         FILE: /Users/Alec/Documents/Bioinformatics/MDV_Project/mdv_integration/sra_main_documentation.txt
+#
+#        USAGE: Simply a documentation script, analysis inside
+#
+#  DESCRIPTION:  This script serves as a step by step documentation script and development script for submitting next-gen sequencing data to the Short Read Archive (SRA)
+# REQUIREMENTS:  None
+#        NOTES:  ---
+#       AUTHOR:  Alec Steep, steepale@msu.edu
+#  AFFILIATION:  Michigan State University (MSU), East Lansing, MI, United States
+#                        USDA ARS Avian Disease and Oncology Lab (ADOL), East Lansing, MI, United States
+#                        Technical University of Munich (TUM), Weihenstephan, Germany
+#      VERSION:  1.0
+#      CREATED:  2019.09.14
+#     REVISION:  
+#===============================================================================
+
+# Permanent PROJECT DIRECTORY (Macbook)
+# /Users/Alec/Documents/Bioinformatics/MDV_Project/SRA
+
+# Website:
+# https://www.ncbi.nlm.nih.gov/sra/docs/submit/
+# Step-by-step tutorial:
+# https://www.ncbi.nlm.nih.gov/sra/docs/submitportal/
+#  SRA Metadata and Submission Overview:
+# https://www.ncbi.nlm.nih.gov/sra/docs/submitmeta/
+
+# Submitting via SRA Submission Portal Wizard
+1. Log in to the SRA Submission Portal Wizard.
+2. Create new SRA submission (click on the button New submission).
+3. Register your project (Bioproject) and biological samples (Biosamples) if you did not register them before at BioProject and BioSample databases, respectively, or in other Submission Portal Wizards. Please refer to the SRA-specific guidelines here.
+4. Submit SRA metadata - information that will link your project, samples/experiments and file names. Please refer to the SRA Metadata Overview.
+5. Upload sequence data files. Please refer to SRA File Upload help.
+
+# The SRA file format guide
+https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/
+
+### Prerequisites
+# Register your project at the BioProject database:
+# https://submit.ncbi.nlm.nih.gov/subs/bioproject/
+# Notes:
+# 	BioProject submission: SUB5190421; Marek's disease lymphoma sequencing
+#	https://www.ncbi.nlm.nih.gov/bioproject/522446
+#	PRJNA522446 : Marek's disease lymphoma sequencing (TaxID: 9031)
+#	We will need to return to this submission to update the publications
+#	Updates need to be made upon request via email: bioprojecthelp@ncbi.nlm.nih.gov
+
+# Register biological samples at the BioSample Database
+# https://submit.ncbi.nlm.nih.gov/subs/biosample/
+# Preview of BioSample types and attributes:
+# ./data/Model.organism.animal.1.0.xlsx
+# Retrieved from: 
+# https://submit.ncbi.nlm.nih.gov/biosample/template/
+
+# Submit information to https://submit.ncbi.nlm.nih.gov/subs/sra/SUB5215631/general
+# Data will be released on 2019-05-01
+
+# Perform ASPERA transfers of BAM files from MSU HPCC
+# https://wiki.hpcc.msu.edu/display/ITH/Aspera+bulk+file+transfer
+# Must perform in gateway
+
+#########################################################################################
+# Identification of Marek’s disease virus genes associated with virulence of US strains #
+#########################################################################################
+
+# Working directory
+cd /Users/Alec/Documents/Bioinformatics/MDV_Project/MDV_comp_Hans_John
+
+# Organize data
+# General info on raw data:
+# ./data/Dunn_file_info.txt
+
+# Generate a hash table of sample names linked to ids in raw sequencing file names
+# ./data/sample-id_file-id.xlsx
+
+# Register your project at the BioProject database:
+https://submit.ncbi.nlm.nih.gov/subs/bioproject/
+
+### 1. Submitter
+# Alexander Cordiner Steep
+# Email: alec.steep@gmail.com
+## Submitting organization: 
+# United States Department of Agriculture: Agricultural Research Service
+## Submitting organization URL:
+# https://www.ars.usda.gov/southeast-area/athens-ga/us-national-poultry-research-center/adol/
+## Department:
+# Avian Disease and Oncology
+## Phone:
+# 517-337-6831
+## Street:
+# 4279 E. Mount Hope Rd.
+## City:
+# East Lansing
+## State:
+# MI
+## Postal Code:
+# 48823
+## Country:
+# United States of America
+
+### 2. Project Type
+
+## Project data type: 
+# Raw sequence reads
+
+## Sample score:
+# Choices:
+Monoisolate: a single animal, cultured cell-line, inbred population (or possibly a heterogeneous population when a single genome assemby is generated from the pooled sample; not preferred).
+Multiisolate: multiple individuals, a population (representative of a species). To be used for variation or other sequence comparison projects, not when multiple genomes will be annotated. Make separate monoisolate projects when more than one genome will be annotated.
+Multi-species: sample represents multiple species.
+Environment: the species content of the sample is not known.
+Synthetic: the sample is synthetically created by a machine.
+Other: specify the sample scope that was used.
+# Multiisolate was chosen
+
+### 3. Target
+
+## Organism name:
+# Gallid alphaherpesvirus 2
+
+# Need to determine the number of sequences
+
+## Description:
+# These data are field isolates of Marek’s disease virus (Gallid alphaherpesvirus 2) collected primarily within the United States. Five samples underwent whole genome sequencing (same names contain ‘WGS’) and the remainder underwent targeted DNA sequencing.
+
+### 4. General Info
+
+## When should this submission be released to the public?
+# Release on specified date or upon publication, whichever is first
+
+## Projected release date:
+# 2020-04-01
+
+### 5. BioSample
+
+
+#### BioSample Submission (https://submit.ncbi.nlm.nih.gov/subs/biosample/)
+# BioSample submission: SUB5308924
+
+### 1. Submitter
+# Alexander Cordiner Steep
+# Email: alec.steep@gmail.com
+## Submitting organization: 
+# United States Department of Agriculture: Agricultural Research Service
+## Submitting organization URL:
+# https://www.ars.usda.gov/southeast-area/athens-ga/us-national-poultry-research-center/adol/
+## Department:
+# Avian Disease and Oncology
+## Phone:
+# 517-337-6831
+## Street:
+# 4279 E. Mount Hope Rd.
+## City:
+# East Lansing
+## State:
+# MI
+## Postal Code:
+# 48823
+## Country:
+# United States of America
+
+### 2. General Info
+## When should this submission be released to the public
+# Release on specified date or upon, publication, whichever is first
+
+## Projected release date
+# 2020-04-01
+
+## Specify if you are submitting a single sample or a file containing multiple samples
+# Batch/Multiple BioSamples
+# You will be asked to upload a tab-delimited text file that describes each of your samples and their attributes. Submission template files can be downloaded from the Attributes tab or the templates page.
+
+### 3. Sample Type
+# Virus sample
+# Use for all virus samples not directly associated with disease. Viral pathogens should be submitted using the Pathogen: Clinical or host-associated pathogen package
+
+### 4. Attributes
+## Uploaded the adjusted metadata file.
+# metadata_sequence_submission_mdv.xlsx
+
+#### Sequence Read Archive (SRA) submission: SUB5308939
+
+### 1. Submitter: same as above
+
+### 2. General
+## Existing BioProject:
+# PRJNA526753
+
+## Projected release date:
+# 2020-04-01
+
+### 3. SRA metadata
+## Metadata file
+# SRA_metadata_mdv.xlsx
+
+### 4. Files
+
+# To upload bfastq files from 
+ascp \
+-i /mnt/home/steepale/.aspera/connect/key/aspera_key_ncbi.openssh \
+-QT \
+-l1000m \
+-k1 \
+-d /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/final_bam/*_Bwa_RG_dedupped_realigned.bam \
+subasp@upload.ncbi.nlm.nih.gov:uploads/alec.steep_gmail.com_UJ1QWBR0/upload1
+
+
+# Make a copy of all files to be uploaded (20140307_DunnSixMdvFullGenome)
+rsync -av --progress \
+/mnt/research/ADOL/Cheng-Lab-Data/archive/20140307_DunnSixMdvFullGenome/*_001.fastq.gz \
+/mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/
+
+# Make a copy of all files to be uploaded (20141001_DunnAmplicons)
+rsync -av --progress \
+/mnt/research/ADOL/Cheng-Lab-Data/archive/20141001_DunnAmplicons/*_001.fastq.gz \
+/mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/
+
+# Make a copy of all files to be uploaded (20150504_DunnSixtyMdvAmplicons)
+rsync -av --progress \
+/mnt/research/ADOL/Cheng-Lab-Data/archive/20150504_DunnSixtyMdvAmplicons/*_001.fastq.gz \
+/mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/
+
+# Remove the BACs
+rm /mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/686_1_BAC_CGTACTAG-CTCTCTAT_L001_R*_001.fastq.gz
+rm /mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/686-Bac1_GACATAGT-ATCGTACG_L001_R*_001.fastq.gz
+
+# The aspera key was downloaded from the website
+# Transfer to HPCC
+rsync -av --progress \
+/Users/Alec/Documents/Bioinformatics/MDV_Project/file_transfer/aspera_key_mdv.openssh \
+steepale@rsync.hpcc.msu.edu:/mnt/home/steepale/.aspera/connect/key/
+
+mv /mnt/research/ADOL/Cheng-Lab-Data/common/Hans_Files/* \
+/mnt/home/steepale/file_transfer/
+
+# To upload fastq files from MDV project (MUST PERFORM IN GATEWAY)
+ascp \
+-i /mnt/home/steepale/.aspera/connect/key/aspera_key_mdv.openssh \
+-QT \
+-l2000m \
+-k1 \
+-d /mnt/home/steepale/file_transfer/* \
+subasp@upload.ncbi.nlm.nih.gov:uploads/alec.steep_gmail.com_UJ1QWBR0/mdv_us_strains/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# To upload bam files associated with DNASeq
+ascp \
+-i /mnt/home/steepale/.aspera/connect/key/aspera_key_ncbi.openssh \
+-QT \
+-l1000m \
+-k1 \
+-d /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/final_bam/*_Bwa_RG_dedupped_realigned.bam \
+subasp@upload.ncbi.nlm.nih.gov:uploads/alec.steep_gmail.com_UJ1QWBR0/upload1
+
+# Generate md5 files
+cd /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/final_bam/
+md5sum \
+*_Bwa_RG_dedupped_realigned.bam \
+> ./wgs_samples.md5
+
+# To upload bam files associated with RNASeq
+ascp \
+-i /mnt/home/steepale/.aspera/connect/key/aspera_key_ncbi.openssh \
+-QT \
+-l2000m \
+-k1 \
+-d /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/RNA_DE/chicken_MDV_genome/data/bams/*_position_sorted_chicken_mdv_genome.bam \
+subasp@upload.ncbi.nlm.nih.gov:uploads/alec.steep_gmail.com_UJ1QWBR0/upload1
+
+# Generate md5 files
+cd /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/RNA_DE/chicken_MDV_genome/data/bams/
+md5sum \
+*_position_sorted_chicken_mdv_genome.bam \
+> ./rnaseq_samples.md5
+
+# To upload samples associated with targeted DNAseq round 1
+
+VAL1=(MSU_738-0-PL01-A01_S1_L001_R1_001.bam MSU_738-1-PL01-B01_S2_L001_R1_001.bam MSU_741-0-PL01-C01_S3_L001_R1_001.bam  MSU_741-1-PL01-D01_S4_L001_R1_001.bam MSU_756-0-PL01-E01_S5_L001_R1_001.bam MSU_756-3-PL01-F01_S6_L001_R1_001.bam MSU_766-0-PL01-G01_S7_L001_R1_001.bam MSU_766-1-PL01-H01_S8_L001_R1_001.bam MSU_777-0-PL01-A02_S9_L001_R1_001.bam MSU_777-3-PL01-B02_S10_L001_R1_001.bam MSU_787-0-PL01-C02_S11_L001_R1_001.bam MSU_787-2-PL01-D02_S12_L001_R1_001.bam MSU_788-0-PL01-E02_S13_L001_R1_001.bam MSU_788-1-PL01-F02_S14_L001_R1_001.bam MSU_794-0-PL01-G02_S15_L001_R1_001.bam MSU_794-1-PL01-H02_S16_L001_R1_001.bam MSU_798-0-PL01-A03_S17_L001_R1_001.bam MSU_798-1-PL01-B03_S18_L001_R1_001.bam MSU_833-0-PL01-C03_S19_L001_R1_001.bam MSU_833-1-PL01-D03_S20_L001_R1_001.bam MSU_834-0-PL01-E03_S21_L001_R1_001.bam MSU_834-2-2-PL01-G03_S23_L001_R1_001.bam MSU_834-2-PL01-F03_S22_L001_R1_001.bam MSU_835-0-PL01-H03_S24_L001_R1_001.bam MSU_835-1-PL01-A04_S25_L001_R1_001.bam MSU_841-0-PL01-B04_S26_L001_R1_001.bam MSU_841-3-PL01-C04_S27_L001_R1_001.bam MSU_842-0-PL01-D04_S28_L001_R1_001.bam MSU_842-2-2-PL01-F04_S30_L001_R1_001.bam MSU_842-2-PL01-E04_S29_L001_R1_001.bam MSU_855-0-PL01-G04_S31_L001_R1_001.bam MSU_855-1-PL01-H04_S32_L001_R1_001.bam MSU_863-0-PL01-A05_S33_L001_R1_001.bam MSU_863-1-PL01-B05_S34_L001_R1_001.bam MSU_884-0-PL01-C05_S35_L001_R1_001.bam MSU_884-2-PL01-D05_S36_L001_R1_001.bam MSU_901-0-PL01-E05_S37_L001_R1_001.bam MSU_901-2-2-PL01-G05_S39_L001_R1_001.bam MSU_901-2-PL01-F05_S38_L001_R1_001.bam MSU_906-0-PL01-H05_S40_L001_R1_001.bam MSU_906-1-PL01-A06_S41_L001_R1_001.bam MSU_911-0-PL01-B06_S42_L001_R1_001.bam MSU_911-1-2-PL01-D06_S44_L001_R1_001.bam MSU_911-1-PL01-C06_S43_L001_R1_001.bam MSU_918-0-PL01-E06_S45_L001_R1_001.bam MSU_918-3-PL01-F06_S46_L001_R1_001.bam MSU_927-0-PL01-G06_S47_L001_R1_001.bam MSU_927-2-PL01-H06_S48_L001_R1_001.bam)
+
+for file in ${VAL1[*]}
+do
+echo ${file}
+ascp \
+-i /mnt/home/steepale/.aspera/connect/key/aspera_key_ncbi.openssh \
+-QT \
+-l2000m \
+-k1 \
+-d /mnt/research/ADOL/OutsideCollaborations/20160201_Cheng_Steep_Xu_Zhang/illumina_validation/data/fastq2bam/alignment/${file} \
+subasp@upload.ncbi.nlm.nih.gov:uploads/alec.steep_gmail.com_UJ1QWBR0/upload1
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
