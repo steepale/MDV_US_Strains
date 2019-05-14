@@ -194,7 +194,7 @@ indel_df <- indel_df %>% mutate(alt = case_when(grepl('-', alt) ~ paste0(substr(
 head(indel_df)
 ```
 
-Create a final table for publication
+#### Create a final table for publication
 ```{r, Pub Table}
 
 # Annotate each sample for mutation, transform data
@@ -225,9 +225,3 @@ write.table(indel_df, file = './data/mdv_indels_genes.txt', sep ='\t',
 ```{r, session}
 sessionInfo()
 ```
-
-
-
-
-
-
